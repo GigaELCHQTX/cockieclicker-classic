@@ -205,23 +205,44 @@ input[type="checkbox"] {
 
 .cookie-button .cookie-body {
   position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  font-size: 130px;
-  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.2));
-  transform: rotate(-8deg);
-  user-select: none;
+  inset: 18px 20px 16px 20px;
+  display: block;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 28%, #f4d8a3 0%, #e9c686 17%, #d9ae65 27%, #bd8b54 47%, #a7713c 68%, #7e4d26 100%);
+  border: 2px solid rgba(88, 51, 20, 0.7);
+  box-shadow:
+    inset -10px -10px 0 rgba(98, 63, 25, 0.12),
+    inset 8px 8px 0 rgba(255, 246, 208, 0.18),
+    0 4px 0 rgba(0, 0, 0, 0.08);
 }
 
 .cookie-button .cookie-shadow {
   position: absolute;
-  inset: 20px 25px 15px 25px;
+  inset: 22px 23px 16px 23px;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(136, 89, 46, 0.8), rgba(85, 48, 27, 0.8) 58%, rgba(58, 35, 20, 0.9) 100%);
+  background: radial-gradient(circle at 30% 30%, rgba(136, 89, 46, 0.75), rgba(85, 48, 27, 0.75) 58%, rgba(58, 35, 20, 0.9) 100%);
   filter: blur(2px);
-  opacity: 0.4;
+  opacity: 0.38;
 }
+
+.cookie-button .chip {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #874a27 0%, #64371c 36%, #3d1f12 100%);
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.cookie-button .chip-1 { top: 28%; left: 22%; }
+.cookie-button .chip-2 { top: 36%; left: 54%; }
+.cookie-button .chip-3 { top: 48%; left: 34%; }
+.cookie-button .chip-4 { top: 55%; left: 62%; }
+.cookie-button .chip-5 { top: 66%; left: 26%; }
+.cookie-button .chip-6 { top: 68%; left: 46%; }
+.cookie-button .chip-7 { top: 32%; left: 68%; }
+.cookie-button .chip-8 { top: 53%; left: 12%; }
 
 .right-panel {
   border-left: 1px solid var(--line);
@@ -320,7 +341,7 @@ input[type="checkbox"] {
   }
 
   .cookie-button .cookie-body {
-    font-size: 110px;
+    inset: 16px 18px 14px 18px;
   }
 }
 
