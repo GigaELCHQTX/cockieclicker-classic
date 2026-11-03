@@ -1,38 +1,72 @@
 <!doctype html>
 <html lang="de">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#25140f">
-  <title>Cookie Clicker Classic</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
-</head>
-<body>
-  <header class="topbar">
-    <a class="brand" href="#" aria-label="Cookie Clicker Classic Startseite"><span class="brand-icon">🍪</span> Cookie Clicker <span class="classic">CLASSIC</span></a>
-    <div class="top-actions"><span class="save-status" id="save-status" aria-live="polite">Automatisch gespeichert</span><button class="quiet-button" id="reset-button" type="button">Neustart</button></div>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cookie Clicker Classic</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <div class="game-shell">
+      <aside class="left-panel">
+        <div class="cookie-counter" id="cookie-count">0</div>
 
-  <main class="game-layout">
-    <section class="bake-panel" aria-label="Keksbäckerei">
-      <p class="eyebrow">DEINE BÄCKEREI</p>
-      <h1><span id="cookie-count">0</span> <span class="cookie-word">Kekse</span></h1>
-      <p class="per-second"><span id="per-second">0</span> Kekse pro Sekunde</p>
-      <button class="big-cookie" id="big-cookie" type="button" aria-label="Keks backen">
-        <span class="cookie-shadow"></span><span class="cookie-art" aria-hidden="true">🍪</span>
-        <span class="click-hint">KLICK MICH!</span>
-      </button>
-      <p class="bake-tip">Klicke auf den Keks, um Kekse zu backen.</p>
-      <div class="stats"><div><span class="stat-icon">🥣</span><span><strong id="total-baked">0</strong><small>insgesamt gebacken</small></span></div><div><span class="stat-icon">🏠</span><span><strong id="building-count">0</strong><small>Gebäude</small></span></div></div>
-    </section>
+        <div class="panel-tools">
+          <div class="stat-row">
+            <span>cookies/second :</span>
+            <span class="red" id="cookies-per-second">0</span>
+          </div>
+          <button type="button" class="text-button">Export save</button>
+          <button type="button" class="text-button">Import save</button>
+          <button type="button" class="text-button" id="reset-button">Reset</button>
+          <div class="stat-row compact">
+            <span>Numbers On</span>
+            <input type="checkbox" checked />
+          </div>
+          <div class="stat-row compact">
+            <span>Flashing</span>
+            <input type="checkbox" />
+          </div>
+          <div class="stat-row compact running">
+            <span>running</span>
+            <span class="red" id="runtime">v.0.1251</span>
+          </div>
+        </div>
 
-    <section class="shop-panel" aria-label="Keks-Shop">
-      <div class="shop-heading"><div><p class="eyebrow">INVESTIERE IN DEINEN ERFOLG</p><h2>Shop</h2></div><span class="shop-bag">🛍️</span></div>
-      <div class="shop-list" id="shop-list"></div>
-      <p class="shop-footer">Tipp: Gebäude backen automatisch Kekse – auch wenn du gerade nicht klickst.</p>
-    </section>
-  </main>
-  <footer>Mit Liebe gebacken <span>♥</span> · Cookie Clicker Classic</footer>
-</body>
+        <div class="log-box">
+          <div class="log-entry"><span class="date">06/09/2013</span><span class="time">0:126</span></div>
+          <div class="log-entry log-mute">-technical fixes</div>
+          <div class="log-entry log-mute">-better servers!</div>
+          <div class="log-entry"><span class="date">24/08/2013</span><span class="time">0:117</span></div>
+          <div class="log-entry log-mute">-the big update is out!</div>
+          <div class="log-entry"><span class="date">17/08/2013</span><span class="time">0:111</span></div>
+          <div class="log-entry log-mute">-Check it out!</div>
+          <div class="log-entry"><span class="date">16/08/2013</span><span class="time">0:112</span></div>
+          <div class="log-entry log-mute">-added a new object</div>
+          <div class="log-entry log-mute">-added the addition of</div>
+          <div class="log-entry log-mute">-flashing</div>
+          <div class="log-entry"><span class="date">24/07/2013</span><span class="time">0:101</span></div>
+          <div class="log-entry log-mute">-welp I'm going back to work</div>
+          <div class="log-entry"><span class="date">13/07/2013</span><span class="time">0:123</span></div>
+          <div class="log-entry log-mute">-added a whole bunch of</div>
+          <div class="log-entry log-mute">-new upgrades!</div>
+          <div class="log-entry log-mute">-added cookies per second</div>
+          <div class="log-entry log-mute">-reworded grandma text</div>
+        </div>
+      </aside>
+
+      <main class="center-panel">
+        <div class="speech-bubble">You feel like making cookies.<br />But nobody wants to eat your cookies.</div>
+        <button type="button" class="cookie-button" id="cookie-button" aria-label="Make cookie">
+          <span class="cookie-shadow"></span>
+          <span class="cookie-body">🍪</span>
+        </button>
+      </main>
+
+      <aside class="right-panel">
+        <div class="shop-list" id="shop-list"></div>
+      </aside>
+    </div>
+  </body>
 </html>
