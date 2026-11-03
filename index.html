@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#25140f">
+  <title>Cookie Clicker Classic</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Cookie Clicker Classic Startseite"><span class="brand-icon">🍪</span> Cookie Clicker <span class="classic">CLASSIC</span></a>
+    <div class="top-actions"><span class="save-status" id="save-status" aria-live="polite">Automatisch gespeichert</span><button class="quiet-button" id="reset-button" type="button">Neustart</button></div>
+  </header>
+
+  <main class="game-layout">
+    <section class="bake-panel" aria-label="Keksbäckerei">
+      <p class="eyebrow">DEINE BÄCKEREI</p>
+      <h1><span id="cookie-count">0</span> <span class="cookie-word">Kekse</span></h1>
+      <p class="per-second"><span id="per-second">0</span> Kekse pro Sekunde</p>
+      <button class="big-cookie" id="big-cookie" type="button" aria-label="Keks backen">
+        <span class="cookie-shadow"></span><span class="cookie-art" aria-hidden="true">🍪</span>
+        <span class="click-hint">KLICK MICH!</span>
+      </button>
+      <p class="bake-tip">Klicke auf den Keks, um Kekse zu backen.</p>
+      <div class="stats"><div><span class="stat-icon">🥣</span><span><strong id="total-baked">0</strong><small>insgesamt gebacken</small></span></div><div><span class="stat-icon">🏠</span><span><strong id="building-count">0</strong><small>Gebäude</small></span></div></div>
+    </section>
+
+    <section class="shop-panel" aria-label="Keks-Shop">
+      <div class="shop-heading"><div><p class="eyebrow">INVESTIERE IN DEINEN ERFOLG</p><h2>Shop</h2></div><span class="shop-bag">🛍️</span></div>
+      <div class="shop-list" id="shop-list"></div>
+      <p class="shop-footer">Tipp: Gebäude backen automatisch Kekse – auch wenn du gerade nicht klickst.</p>
+    </section>
+  </main>
+  <footer>Mit Liebe gebacken <span>♥</span> · Cookie Clicker Classic</footer>
+</body>
+</html>
