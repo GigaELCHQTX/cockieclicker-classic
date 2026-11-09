@@ -2,18 +2,17 @@
   'use strict';
 
   const buildings = [
-    { id: 'cursor', name: 'Cursor', icon: '🖱️', description: 'Clicks cookies for you.', basePrice: 15, cps: 0.1 },
-    { id: 'grandma', name: 'Grandma', icon: '👵', description: 'A nice old lady bakes cookies.', basePrice: 100, cps: 1 },
-    { id: 'farm', name: 'Farm', icon: '🌾', description: 'Grows cookie ingredients.', basePrice: 1100, cps: 8 },
-    { id: 'mine', name: 'Mine', icon: '⛏️', description: 'Digs up chocolate and dough.', basePrice: 12000, cps: 47 },
-    { id: 'factory', name: 'Factory', icon: '🏭', description: 'Produces cookies on the assembly line.', basePrice: 130000, cps: 260 },
-    { id: 'bank', name: 'Bank', icon: '🏦', description: 'Invests cookies for profit.', basePrice: 1400000, cps: 1400 },
-    { id: 'temple', name: 'Temple', icon: '🛕', description: 'Prays to the cookie gods.', basePrice: 20000000, cps: 7800 },
-    { id: 'portal', name: 'Portal', icon: '🌀', description: 'Opens a route to the cookieverse.', basePrice: 330000000, cps: 44000 }
+    { id: 'cursor', name: 'Cursor', icon: '👆', description: 'Autoclicks every 5 seconds.', basePrice: 15, cps: 0.1 },
+    { id: 'grandma', name: 'Grandma', icon: '👵🏻', description: 'A nice grandma to bake more cookies.', basePrice: 100, cps: 1 },
+    { id: 'factory', name: 'Factory', icon: '🏭', description: 'Produces large quantities of cookies.', basePrice: 500, cps: 4 },
+    { id: 'mine', name: 'Mine', icon: '⛏️', description: 'Mines out cookie dough and chocolate chips.', basePrice: 2000, cps: 10 },
+    { id: 'shipment', name: 'Shipment', icon: '🚀', description: 'Brings in fresh cookies from the cookie planet.', basePrice: 7000, cps: 20 },
+    { id: 'alchemy', name: 'Alchemy lab', icon: '⚗️', description: 'Turns gold into cookies!', basePrice: 50000, cps: 50 },
+    { id: 'portal', name: 'Portal', icon: '🌀', description: 'Opens a door to the Cookieverse.', basePrice: 1000000, cps: 1000 },
+    { id: 'timemachine', name: 'Time machine', icon: '⏰', description: 'Brings cookies from the past, before they were even eaten.', basePrice: 123456789, cps: 98765 }
   ];
 
   const SAVE_KEY = 'cookie-clicker-classic-save-v1';
-
   const state = loadGame();
   let lastFrame = Date.now();
 
@@ -22,17 +21,19 @@
   const shopListEl = document.getElementById('shop-list');
   const resetButton = document.getElementById('reset-button');
   const cookieButton = document.getElementById('cookie-button');
+  const numberFormat = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
   function getCps() {
     return buildings.reduce((sum, item) => sum + (state.buildings[item.id] || 0) * item.cps, 0);
   }
 
   function formatNumber(value) {
-    if (value >= 1e12) return `${(value / 1e12).toFixed(1)}T`;
-    if (value >= 1e9) return `${(value / 1e9).toFixed(1)}B`;
-    if (value >= 1e6) return `${(value / 1e6).toFixed(1)}M`;
-    if (value >= 1e3) return `${(value / 1e3).toFixed(1)}K`;
-    return `${Math.floor(value)}`;
+    if (value >= 1e15) return `${numberFormat.format(value / 1e15)} quadrillion`;
+    if (value >= 1e12) return `${numberFormat.format(value / 1e12)} trillion`;
+    if (value >= 1e9) return `${numberFormat.format(value / 1e9)} billion`;
+    if (value >= 1e6) return `${numberFormat.format(value / 1e6)} million`;
+    if (value >= 1e3) return numberFormat.format(Math.floor(value));
+    return numberFormat.format(Math.floor(value));
   }
 
   function freshState() {
@@ -49,13 +50,12 @@
       if (!saved || typeof saved !== 'object') return freshState();
 
       const loaded = freshState();
-      loaded.cookies = Number(saved.cookies) || 0;
-      loaded.totalBaked = Number(saved.totalBaked) || loaded.cookies;
+      loaded.cookies = Math.max(0, Number(saved.cookies) || 0);
+      loaded.totalBaked = Math.max(loaded.cookies, Number(saved.totalBaked) || 0);
 
       for (const item of buildings) {
-        loaded.buildings[item.id] = Number(saved.buildings?.[item.id]) || 0;
+        loaded.buildings[item.id] = Math.max(0, Math.floor(Number(saved.buildings?.[item.id]) || 0));
       }
-
       return loaded;
     } catch {
       return freshState();
@@ -63,7 +63,11 @@
   }
 
   function saveGame() {
-    localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+    } catch {
+      // The game remains playable if browser storage is unavailable.
+    }
   }
 
   function buyPrice(item) {
@@ -77,16 +81,13 @@
       const disabled = state.cookies < price ? 'disabled' : '';
 
       return `
-        <button class="shop-item" type="button" data-building="${item.id}" ${disabled}>
+        <button class="shop-item" type="button" data-building="${item.id}" ${disabled} aria-label="Buy ${item.name} for ${formatNumber(price)} cookies">
           <span class="shop-thumb" aria-hidden="true">${item.icon}</span>
           <span class="shop-body">
-            <span class="shop-name">${item.name}</span>
+            <span class="shop-name">${item.name} - <span class="cookie-price">🍪 ${formatNumber(price)}</span></span>
             <span class="shop-desc">${item.description}</span>
           </span>
-          <span class="shop-price">
-            <strong>${formatNumber(price)}</strong>
-            <span class="count">${count}</span>
-          </span>
+          <span class="shop-count" aria-label="Owned: ${count}">${count}</span>
         </button>
       `;
     }).join('');
@@ -122,22 +123,23 @@
   });
 
   resetButton.addEventListener('click', () => {
-    const next = freshState();
-    Object.assign(state, next);
+    if (!window.confirm('Reset your game and start over?')) return;
+    Object.assign(state, freshState());
     render();
     saveGame();
   });
 
   setInterval(() => {
     const now = Date.now();
-    const elapsed = (now - lastFrame) / 1000;
+    const elapsed = Math.min((now - lastFrame) / 1000, 5);
     lastFrame = now;
-
     const earnings = getCps() * elapsed;
     state.cookies += earnings;
     state.totalBaked += earnings;
     render();
   }, 250);
 
+  setInterval(saveGame, 10000);
+  window.addEventListener('beforeunload', saveGame);
   render();
 })();
