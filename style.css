@@ -105,6 +105,7 @@ input[type="checkbox"] { width: 12px; height: 12px; margin: 0; accent-color: #55
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 0;
   background: var(--bg);
 }
 .speech-bubble {
@@ -144,6 +145,57 @@ input[type="checkbox"] { width: 12px; height: 12px; margin: 0; accent-color: #55
   -webkit-user-drag: none;
 }
 .cookie-button .cookie-shadow { display: none; }
+
+/* Cursors are arranged on evenly spaced rings around the cookie. */
+.cursor-layer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.cursor-marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 34px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  transform: translate(calc(-50% + var(--cursor-x)), calc(-50% + var(--cursor-y)));
+}
+.cursor-hand {
+  display: block;
+  font-family: Arial, sans-serif;
+  font-size: 31px;
+  line-height: 1;
+  filter: drop-shadow(1px 2px 0 rgba(0, 0, 0, .55));
+  transform: rotate(var(--cursor-angle));
+  transform-origin: 50% 70%;
+}
+.cursor-number {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  color: #fff;
+  font-family: Georgia, serif;
+  font-size: 17px;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px #111, -1px -1px 2px #111;
+  opacity: 0;
+  transform: translate(-50%, 0);
+  white-space: nowrap;
+}
+.cursor-number.pop {
+  animation: cursor-cookie-pop .9s ease-out forwards;
+}
+@keyframes cursor-cookie-pop {
+  0% { opacity: 0; transform: translate(-50%, 8px) scale(.8); }
+  18% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -24px) scale(1); }
+}
 
 .right-panel {
   height: 100vh;

@@ -2,7 +2,7 @@
   'use strict';
 
   const buildings = [
-    { id: 'cursor', name: 'Cursor', icon: '👆', description: 'Autoclicks every 5 seconds.', basePrice: 15, cps: 0.1 },
+    { id: 'cursor', name: 'Cursor', icon: '👆', description: 'Autoclicks every 5 seconds.', basePrice: 15, cps: 0.2 },
     { id: 'grandma', name: 'Grandma', icon: '👵🏻', description: 'A nice grandma to bake more cookies.', basePrice: 100, cps: 1 },
     { id: 'factory', name: 'Factory', icon: '🏭', description: 'Produces large quantities of cookies.', basePrice: 500, cps: 4 },
     { id: 'mine', name: 'Mine', icon: '⛏️', description: 'Mines out cookie dough and chocolate chips.', basePrice: 2000, cps: 10 },
@@ -15,10 +15,12 @@
   const SAVE_KEY = 'cookie-clicker-classic-save-v1';
   const state = loadGame();
   let lastFrame = Date.now();
+  let cursorTimers = [];
 
   const cookieCountEl = document.getElementById('cookie-count');
   const cookiesPerSecondEl = document.getElementById('cookies-per-second');
   const shopListEl = document.getElementById('shop-list');
+  const cursorLayerEl = document.getElementById('cursor-layer');
   const resetButton = document.getElementById('reset-button');
   const cookieButton = document.getElementById('cookie-button');
   const numberFormat = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
@@ -27,12 +29,15 @@
     return buildings.reduce((sum, item) => sum + (state.buildings[item.id] || 0) * item.cps, 0);
   }
 
+  function getNonCursorCps() {
+    return buildings.reduce((sum, item) => item.id === 'cursor' ? sum : sum + (state.buildings[item.id] || 0) * item.cps, 0);
+  }
+
   function formatNumber(value) {
     if (value >= 1e15) return `${numberFormat.format(value / 1e15)} quadrillion`;
     if (value >= 1e12) return `${numberFormat.format(value / 1e12)} trillion`;
     if (value >= 1e9) return `${numberFormat.format(value / 1e9)} billion`;
     if (value >= 1e6) return `${numberFormat.format(value / 1e6)} million`;
-    if (value >= 1e3) return numberFormat.format(Math.floor(value));
     return numberFormat.format(Math.floor(value));
   }
 
@@ -52,7 +57,6 @@
       const loaded = freshState();
       loaded.cookies = Math.max(0, Number(saved.cookies) || 0);
       loaded.totalBaked = Math.max(loaded.cookies, Number(saved.totalBaked) || 0);
-
       for (const item of buildings) {
         loaded.buildings[item.id] = Math.max(0, Math.floor(Number(saved.buildings?.[item.id]) || 0));
       }
@@ -72,6 +76,32 @@
 
   function buyPrice(item) {
     return Math.ceil(item.basePrice * Math.pow(1.15, state.buildings[item.id] || 0));
+  }
+
+  function renderCursors() {
+    const count = state.buildings.cursor || 0;
+    const fragment = document.createDocumentFragment();
+    const maxPerRing = 10;
+    const firstRadius = 126;
+    const ringGap = 48;
+
+    for (let index = 0; index < count; index += 1) {
+      const ring = Math.floor(index / maxPerRing);
+      const positionInRing = index % maxPerRing;
+      const countInRing = Math.min(maxPerRing, count - ring * maxPerRing);
+      const angle = -Math.PI / 2 + (Math.PI * 2 * positionInRing) / countInRing;
+      const radius = firstRadius + ring * ringGap;
+      const marker = document.createElement('span');
+      marker.className = 'cursor-marker';
+      marker.dataset.cursorIndex = String(index);
+      marker.style.setProperty('--cursor-x', `${Math.cos(angle) * radius}px`);
+      marker.style.setProperty('--cursor-y', `${Math.sin(angle) * radius}px`);
+      marker.style.setProperty('--cursor-angle', `${(angle * 180 / Math.PI) + 90}deg`);
+      marker.innerHTML = '<span class="cursor-hand">👆</span><span class="cursor-number">+1</span>';
+      fragment.appendChild(marker);
+    }
+
+    cursorLayerEl.replaceChildren(fragment);
   }
 
   function renderShop() {
@@ -97,6 +127,34 @@
     cookieCountEl.textContent = formatNumber(state.cookies);
     cookiesPerSecondEl.textContent = formatNumber(getCps());
     renderShop();
+    renderCursors();
+  }
+
+  function addCursorCookie(cursorIndex) {
+    state.cookies += 1;
+    state.totalBaked += 1;
+    const marker = cursorLayerEl.querySelector(`[data-cursor-index="${cursorIndex}"]`);
+    const number = marker?.querySelector('.cursor-number');
+    if (number) {
+      number.classList.remove('pop');
+      void number.offsetWidth;
+      number.classList.add('pop');
+    }
+  }
+
+  function setupCursorTimers(newCursorIndex = null) {
+    const count = state.buildings.cursor || 0;
+    const now = Date.now();
+    cursorTimers.length = count;
+
+    if (newCursorIndex !== null) {
+      cursorTimers[newCursorIndex] = now + 5000;
+      return;
+    }
+
+    for (let index = 0; index < count; index += 1) {
+      cursorTimers[index] = now + (5000 * (index + 1)) / count;
+    }
   }
 
   cookieButton.addEventListener('click', () => {
@@ -109,15 +167,14 @@
   shopListEl.addEventListener('click', (event) => {
     const button = event.target.closest('[data-building]');
     if (!button) return;
-
     const item = buildings.find((entry) => entry.id === button.dataset.building);
     if (!item) return;
 
     const price = buyPrice(item);
     if (state.cookies < price) return;
-
     state.cookies -= price;
     state.buildings[item.id] += 1;
+    if (item.id === 'cursor') setupCursorTimers(state.buildings.cursor - 1);
     render();
     saveGame();
   });
@@ -125,6 +182,7 @@
   resetButton.addEventListener('click', () => {
     if (!window.confirm('Reset your game and start over?')) return;
     Object.assign(state, freshState());
+    cursorTimers = [];
     render();
     saveGame();
   });
@@ -133,13 +191,23 @@
     const now = Date.now();
     const elapsed = Math.min((now - lastFrame) / 1000, 5);
     lastFrame = now;
-    const earnings = getCps() * elapsed;
-    state.cookies += earnings;
-    state.totalBaked += earnings;
+
+    const passiveCookies = getNonCursorCps() * elapsed;
+    state.cookies += passiveCookies;
+    state.totalBaked += passiveCookies;
+
+    for (let index = 0; index < cursorTimers.length; index += 1) {
+      while (cursorTimers[index] <= now) {
+        addCursorCookie(index);
+        cursorTimers[index] += 5000;
+      }
+    }
+
     render();
   }, 250);
 
   setInterval(saveGame, 10000);
   window.addEventListener('beforeunload', saveGame);
+  setupCursorTimers();
   render();
 })();
