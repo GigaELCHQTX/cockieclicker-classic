@@ -96,7 +96,8 @@
       marker.dataset.cursorIndex = String(index);
       marker.style.setProperty('--cursor-x', `${Math.cos(angle) * radius}px`);
       marker.style.setProperty('--cursor-y', `${Math.sin(angle) * radius}px`);
-      marker.style.setProperty('--cursor-angle', `${(angle * 180 / Math.PI) + 90}deg`);
+      // The hand emoji points upward by default. This rotation points its fingertip inward.
+      marker.style.setProperty('--cursor-angle', `${(angle * 180 / Math.PI) + 270}deg`);
       marker.innerHTML = '<span class="cursor-hand">👆</span><span class="cursor-number">+1</span>';
       fragment.appendChild(marker);
     }
