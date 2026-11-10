@@ -16,6 +16,7 @@
   const state = loadGame();
   let lastFrame = Date.now();
   let cursorTimers = [];
+  let renderedCursorCount = -1;
 
   const cookieCountEl = document.getElementById('cookie-count');
   const cookiesPerSecondEl = document.getElementById('cookies-per-second');
@@ -80,6 +81,9 @@
 
   function renderCursors() {
     const count = state.buildings.cursor || 0;
+    // Keep existing cursor elements between game ticks so their tap animations can finish.
+    if (count === renderedCursorCount) return;
+
     const fragment = document.createDocumentFragment();
     const maxPerRing = 10;
     const firstRadius = 126;
@@ -96,20 +100,19 @@
       marker.dataset.cursorIndex = String(index);
       marker.style.setProperty('--cursor-x', `${Math.cos(angle) * radius}px`);
       marker.style.setProperty('--cursor-y', `${Math.sin(angle) * radius}px`);
-      // The hand emoji points upward by default. This rotation points its fingertip inward.
       marker.style.setProperty('--cursor-angle', `${(angle * 180 / Math.PI) + 270}deg`);
       marker.innerHTML = '<span class="cursor-hand">👆</span><span class="cursor-number">+1</span>';
       fragment.appendChild(marker);
     }
 
     cursorLayerEl.replaceChildren(fragment);
+    renderedCursorCount = count;
   }
 
   function showManualClickNumber() {
     const number = document.createElement('span');
-    number.className = 'cursor-number';
+    number.className = 'cursor-number manual-click-number';
     number.textContent = '+1';
-    number.style.cssText = 'position:absolute;left:0;top:-30px;opacity:1;color:#fff;font:700 20px Georgia,serif;text-shadow:1px 1px 2px #111,-1px -1px 2px #111;white-space:nowrap;pointer-events:none;';
     cursorLayerEl.appendChild(number);
 
     if (typeof number.animate === 'function') {
@@ -153,11 +156,16 @@
   function addCursorCookie(cursorIndex) {
     state.cookies += 1;
     state.totalBaked += 1;
+
     const marker = cursorLayerEl.querySelector(`[data-cursor-index="${cursorIndex}"]`);
     const number = marker?.querySelector('.cursor-number');
-    if (number) {
+    const hand = marker?.querySelector('.cursor-hand');
+    if (marker && number && hand) {
+      marker.classList.remove('clicking');
       number.classList.remove('pop');
-      void number.offsetWidth;
+      // Restart both animations even when this cursor clicks again quickly.
+      void marker.offsetWidth;
+      marker.classList.add('clicking');
       number.classList.add('pop');
     }
   }
@@ -204,6 +212,7 @@
     if (!window.confirm('Reset your game and start over?')) return;
     Object.assign(state, freshState());
     cursorTimers = [];
+    renderedCursorCount = -1;
     render();
     saveGame();
   });
