@@ -175,6 +175,13 @@ input[type="checkbox"] { width: 12px; height: 12px; margin: 0; accent-color: #55
   transform: rotate(var(--cursor-angle));
   transform-origin: 50% 70%;
 }
+.cursor-marker.clicking .cursor-hand {
+  animation: cursor-tap 220ms ease-in-out;
+}
+@keyframes cursor-tap {
+  0%, 100% { transform: rotate(var(--cursor-angle)) translateY(0) scale(1); }
+  45% { transform: rotate(var(--cursor-angle)) translateY(11px) scale(.88); }
+}
 .cursor-number {
   position: absolute;
   top: -8px;
@@ -190,6 +197,13 @@ input[type="checkbox"] { width: 12px; height: 12px; margin: 0; accent-color: #55
 }
 .cursor-number.pop {
   animation: cursor-cookie-pop .9s ease-out forwards;
+}
+.cursor-number.manual-click-number {
+  position: absolute;
+  top: -12px;
+  left: 0;
+  color: #fff;
+  font-size: 20px;
 }
 @keyframes cursor-cookie-pop {
   0% { opacity: 0; transform: translate(-50%, 8px) scale(.8); }
