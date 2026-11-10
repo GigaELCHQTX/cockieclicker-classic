@@ -104,6 +104,25 @@
     cursorLayerEl.replaceChildren(fragment);
   }
 
+  function showManualClickNumber() {
+    const number = document.createElement('span');
+    number.className = 'cursor-number';
+    number.textContent = '+1';
+    number.style.cssText = 'position:absolute;left:0;top:-30px;opacity:1;color:#fff;font:700 20px Georgia,serif;text-shadow:1px 1px 2px #111,-1px -1px 2px #111;white-space:nowrap;pointer-events:none;';
+    cursorLayerEl.appendChild(number);
+
+    if (typeof number.animate === 'function') {
+      const animation = number.animate([
+        { opacity: 0, transform: 'translate(-50%, 8px) scale(.8)' },
+        { opacity: 1, offset: 0.18 },
+        { opacity: 0, transform: 'translate(-50%, -28px) scale(1)' }
+      ], { duration: 900, easing: 'ease-out' });
+      animation.onfinish = () => number.remove();
+    } else {
+      window.setTimeout(() => number.remove(), 900);
+    }
+  }
+
   function renderShop() {
     shopListEl.innerHTML = buildings.map((item) => {
       const price = buyPrice(item);
@@ -160,6 +179,7 @@
   cookieButton.addEventListener('click', () => {
     state.cookies += 1;
     state.totalBaked += 1;
+    showManualClickNumber();
     render();
     saveGame();
   });
