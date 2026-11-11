@@ -159,8 +159,7 @@
 
     const marker = cursorLayerEl.querySelector(`[data-cursor-index="${cursorIndex}"]`);
     const number = marker?.querySelector('.cursor-number');
-    const hand = marker?.querySelector('.cursor-hand');
-    if (marker && number && hand) {
+    if (marker && number) {
       marker.classList.remove('clicking');
       number.classList.remove('pop');
       // Restart both animations even when this cursor clicks again quickly.
@@ -170,16 +169,12 @@
     }
   }
 
-  function setupCursorTimers(newCursorIndex = null) {
+  function setupCursorTimers() {
     const count = state.buildings.cursor || 0;
     const now = Date.now();
     cursorTimers.length = count;
 
-    if (newCursorIndex !== null) {
-      cursorTimers[newCursorIndex] = now + 5000;
-      return;
-    }
-
+    // Spread clicks evenly across each five-second cycle, so cursors click one after another.
     for (let index = 0; index < count; index += 1) {
       cursorTimers[index] = now + (5000 * (index + 1)) / count;
     }
@@ -203,7 +198,7 @@
     if (state.cookies < price) return;
     state.cookies -= price;
     state.buildings[item.id] += 1;
-    if (item.id === 'cursor') setupCursorTimers(state.buildings.cursor - 1);
+    if (item.id === 'cursor') setupCursorTimers();
     render();
     saveGame();
   });
